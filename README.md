@@ -161,26 +161,9 @@ is_valid = BestPracticeExample.validate_email('test@example.com')
 
 ## 静态方法不能替换类方法案例
 
-> 虽然 python 中静态方法可以直接用`类名`代替类方法的第一个参数`cls`,
-> 静态方法确实可以通过类名调用类属性和其他方法，但这无法替代类方法的多态性功能。
+虽然 python 中`静态方法`可以直接用`类名`代替`类方法`的第一个参数`cls`, 也能通过`类名`调用类属性和其他方法，但这依然无法替代`类方法`。
 
-选择指南：
-1. 使用类方法（`@classmethod`）当：
-    + 需要支持继承和多态
-    + 实现工厂方法
-    + 操作类属性且可能被子类重写
-    + 需要返回当前类或其子类的实例
-2. 使用静态方法（`@staticmethod`）当：
-    + 方法是纯函数，不依赖类或实例状态
-    + 确定类不会被继承，或继承时不需要多态
-    + 只是将相关函数组织在一起
-    + 性能要求极高，需要避免 cls 参数开销（极少数情况）
-3. 简单规则：
-    + 如果方法中硬编码了类名，考虑是否应该用 `@classmethod`
-    + 如果子类调用方法时应该返回子类实例，必须用 `@classmethod`
-    + 如果方法只是工具函数，与类关系不大，用 `@staticmethod`
-
-**多态性缺失（最重要！）** 
+**多态性缺失（最重要！）**
 
 ```python
 class BaseSerializer:
@@ -226,14 +209,15 @@ print(f"可以调用子类方法: {result2.to_json()}")  # ✅ 正常工作
 ```
 
 **配置继承问题**
+
 ```python
 class Config:
     default_value = "parent"
-    
+
     @staticmethod
     def static_get_default():
         return Config.default_value  # 硬编码父类
-    
+
     @classmethod
     def class_get_default(cls):
         return cls.default_value  # 动态查找
@@ -247,3 +231,20 @@ print("父类类方法:", Config.class_get_default())     # parent
 print("子类静态方法:", ChildConfig.static_get_default())  # parent ❌ 错误！
 print("子类类方法:", ChildConfig.class_get_default())     # child ✅ 正确！
 ```
+
+## 选择指南
+
+1. 使用类方法（`@classmethod`）当：
+   - 需要支持继承和多态
+   - 实现工厂方法
+   - 操作类属性且可能被子类重写
+   - 需要返回当前类或其子类的实例
+2. 使用静态方法（`@staticmethod`）当：
+   - 方法是纯函数，不依赖类或实例状态
+   - 确定类不会被继承，或继承时不需要多态
+   - 只是将相关函数组织在一起
+   - 性能要求极高，需要避免 cls 参数开销（极少数情况）
+3. 简单规则：
+   - 如果方法中硬编码了类名，考虑是否应该用 `@classmethod`
+   - 如果子类调用方法时应该返回子类实例，必须用 `@classmethod`
+   - 如果方法只是工具函数，与类关系不大，用 `@staticmethod`
