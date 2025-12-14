@@ -1,5 +1,12 @@
 {
-  "cSpell.words": [
-    "nonlocal"
-  ]
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "python.defaultFormatter": "ms-python.black-formatter",
+    "python.formatting.provider": "black",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "basic"
 }
